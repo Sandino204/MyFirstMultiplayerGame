@@ -19,7 +19,9 @@
     <canvas id="screen" width="10" height="10">
 
     </canvas>
+    
     <script>
+
         const screen = document.getElementById('screen')
         const context = screen.getContext('2d')
         const currentPlyerId = 'player1'
@@ -32,6 +34,10 @@
                 }, 
                 fruits: {
                     
+                },
+                screen: {
+                    width: 9, 
+                    height: 9
                 }
             }
 
@@ -85,7 +91,7 @@
                         return
                     },
                     ArrowDown(player){
-                        if(player.y + 1 <= screen.height){
+                        if(player.y + 1 <= state.screen.height){
                             player.y = player.y + 1
                         }
                         return
@@ -98,7 +104,7 @@
                         return
                     }, 
                     ArrowRight(player){
-                        if(player.x + 1 <= screen.width){
+                        if(player.x + 1 <= state.screen.width){
                             player.x = player.x + 1
                         }
                         return
@@ -128,25 +134,25 @@
                         return
                     },
                     s(player){
-                        if(player.y + 1 <= screen.height){
+                        if(player.y + 1 <= state.screen.height){
                             player.y = player.y + 1
                         }
                         return
                     }, 
                     S(player){
-                        if(player.y + 1 <= screen.height){
+                        if(player.y + 1 <= state.screen.height){
                             player.y = player.y + 1
                         }
                         return
                     }, 
                     d(player){  
-                        if(player.x + 1 <= screen.width){
+                        if(player.x + 1 <= state.screen.width){
                             player.x = player.x + 1
                         }
                         return
                     }, 
                     D(player){
-                        if(player.x + 1 <= screen.width){
+                        if(player.x + 1 <= state.screen.width){
                             player.x = player.x + 1
                         }
                         return
@@ -194,6 +200,9 @@
         game.addPlayer({playerId: 'player1', playerX: 0, playerY: 0})
         game.addPlayer({playerId: 'player2', playerX: 4, playerY: 5})
         game.addFruits({fruitId: 'Lala', fruitX: 4, fruitY: 3})
+
+        renderScreen(game.state.screen, game, requestAnimationFrame)
+        
         function createKeyboardListener(){
 
             const state = {
@@ -213,7 +222,7 @@
             }
 
             document.addEventListener('keydown', handleKeyDown)
-            
+
             function handleKeyDown(event) {
                 const keyPressed = event.key
                 const player = game.state.players[currentPlyerId]
@@ -225,7 +234,7 @@
 
                 // game.movePlayer(command)
                 notifyAll(command)
-            
+
             }
 
             return {
@@ -233,9 +242,10 @@
             }
         }
 
+        
         renderScreen()
 
-        function renderScreen(){
+        function renderScreen(screen, game, requestAnimationFrame){
 
             context.fillStyle = 'white'
             context.clearRect( 0 , 0 , 10 , 10)
@@ -252,7 +262,9 @@
                 context.fillRect(fruit.x, fruit.y, 1, 1)
             }
 
-            requestAnimationFrame(renderScreen)
+            requestAnimationFrame(() => {
+                renderScreen(screen, game, requestAnimationFrame)
+            })
         }
 
 
