@@ -28,20 +28,54 @@
 
             const state = {
                 players: {
-                    'player1': {x: 1, y: 1}, 
-                    'player2': {x: 9, y: 9}
+                    
                 }, 
                 fruits: {
-                    'fruit1': {x: 3, y: 1}
-
+                    
                 }
+            }
+
+            function addPlayer(command){
+                const playerId = command.playerId
+                const playerX = command.playerX
+                const playerY = command.playerY
+
+                state.players[playerId] ={
+                    x: playerX, 
+                    y: playerY,
+                }
+            }
+
+            function removePlayer(command){
+                const playerId = command.playerId
+
+                delete state.players[playerId]
+            }
+
+            function addFruits(command){
+                const fruitId = command.fruitId
+                const fruitX = command.fruitX
+                const fruitY = command.fruitY
+
+                state.fruits[fruitId] ={
+                    x: fruitX, 
+                    y: fruitY,
+                }
+            }
+
+            function removeFruits(command){
+                const fruitId = command.fruitId
+
+                delete state.fruits[fruitId]
             }
 
             function movePlayer(command){
 
                 const keyPressed = command.keyPressed
                 const player = state.players[command.playerId]
-               
+                const playerId = command.playerId
+                
+                console.log(player)
 
                 const acceptedMoves = {
                     ArrowUp(player){
@@ -51,10 +85,11 @@
                         return
                     },
                     ArrowDown(player){
-                        if(player.y + 1 >= screen.height){
+                        if(player.y + 1 <= screen.height){
                             player.y = player.y + 1
                         }
                         return
+                        
                     },
                     ArrowLeft(player){
                         if(player.x - 1 >= 0){
@@ -63,7 +98,7 @@
                         return
                     }, 
                     ArrowRight(player){
-                        if(player.x + 1 >= screen.width){
+                        if(player.x + 1 <= screen.width){
                             player.x = player.x + 1
                         }
                         return
@@ -93,25 +128,25 @@
                         return
                     },
                     s(player){
-                        if(player.y + 1 >= screen.height){
+                        if(player.y + 1 <= screen.height){
                             player.y = player.y + 1
                         }
                         return
                     }, 
                     S(player){
-                        if(player.y + 1 >= screen.height){
+                        if(player.y + 1 <= screen.height){
                             player.y = player.y + 1
                         }
                         return
                     }, 
                     d(player){  
-                        if(player.x + 1 >= screen.width){
+                        if(player.x + 1 <= screen.width){
                             player.x = player.x + 1
                         }
                         return
                     }, 
                     D(player){
-                        if(player.x + 1 >= screen.width){
+                        if(player.x + 1 <= screen.width){
                             player.x = player.x + 1
                         }
                         return
@@ -121,17 +156,32 @@
 
                 const moveFunction = acceptedMoves[keyPressed]
                 
-                if(moveFunction){
+                if(player && moveFunction){
                     moveFunction(player)
+                    checkForFruitCollision(playerId)
                 }
-
-                return 
-
-
 
             }
 
+            function checkForFruitCollision(playerId){
+
+                    const player = state.players[playerId]
+
+                    for(const fruitId in state.fruits){
+                        const fruit = state.fruits[fruitId]
+                        
+                        if(player.x === fruit.x && player.y === fruit.y){
+                            removeFruits({fruitId: fruitId})
+                        }
+                    }
+                
+            }
+
             return {
+                addPlayer: addPlayer,
+                removePlayer: removePlayer,
+                addFruits: addFruits, 
+                removeFruits: removeFruits,
                 movePlayer: movePlayer, 
                 state: state
             }
@@ -141,7 +191,9 @@
         const keyBoardListener = createKeyboardListener()
         keyBoardListener.subscribe(game.movePlayer)
 
-
+        game.addPlayer({playerId: 'player1', playerX: 0, playerY: 0})
+        game.addPlayer({playerId: 'player2', playerX: 4, playerY: 5})
+        game.addFruits({fruitId: 'Lala', fruitX: 4, fruitY: 3})
         function createKeyboardListener(){
 
             const state = {
