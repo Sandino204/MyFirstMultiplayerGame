@@ -1,7 +1,13 @@
 function createKeyboardListener(){
 
     const state = {
-        observers: []
+        observers: [], 
+        playerId: null
+    }
+
+
+    function registerPlayerId(playerId){
+        state.playerId = playerId
     }
 
     function subscribe(observerFunction){
@@ -20,10 +26,10 @@ function createKeyboardListener(){
 
     function handleKeyDown(event) {
         const keyPressed = event.key
-        const player = game.state.players[currentPlyerId]
 
         const command = {
-            playerId: 'player1',
+            type: 'move-player',
+            playerId: state.playerId,
             keyPressed: keyPressed
         }
 
@@ -33,6 +39,7 @@ function createKeyboardListener(){
     }
 
     return {
-        subscribe: subscribe
+        subscribe: subscribe, 
+        registerPlayerId
     }
 }

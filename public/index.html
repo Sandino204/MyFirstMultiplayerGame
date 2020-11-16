@@ -28,13 +28,14 @@
 
         const screen = document.getElementById('screen')
         const context = screen.getContext('2d')
-        const currentPlyerId = 'player1'
+        // const currentPlyerId = 'player1'
 
         const game = createGame()
         const keyBoardListener = createKeyboardListener()
         keyBoardListener.subscribe(game.movePlayer)
+        game.start()
 
-        renderScreen(game.state.screen, game, requestAnimationFrame)
+        // renderScreen(game.state.screen, game, requestAnimationFrame)
 
 
         const socket = io()
@@ -42,13 +43,44 @@
         socket.on('connect', () => {
             const playerId = socket.id
             console.log(`player connected on Client with id ${playerId} `)
+            renderScreen(game.state.screen, game, requestAnimationFrame, playerId)
         })
 
         socket.on('setup', (state) => {
-            console.log(`Receiving "setup" event from server `)
-            console.log(state)
+            const playerId = socket.id
+            game.setState(state)
 
-            game.state = state
+            keyBoardListener.registerPlayerId(playerId)
+            keyBoardListener.subscribe(game.movePlayer)
+            keyBoardListener.subscribe((command) => {
+                socket.emit('move-player', command)
+            })
+
+        })
+
+        socket.on('add-player', (command) => {
+            game.addPlayer(command)
+        })       
+
+        socket.on('remove-player',  (command) => {
+            game.removePlayer(command)
+
+        })
+
+        socket.on('move-player', (command) => {
+            const playerId = socket.id
+
+            if(playerId !== command.playerId){
+                game.movePlayer(command)
+            }
+        })
+
+        socket.on('add-fruit', (command) => {
+            game.addFruit(command)
+        })
+
+        socket.on('remove-fruit', (command) => {
+            game.removeFruit(command)
         })
 
     </script>
